@@ -41,14 +41,23 @@ var module_exports = async({
 	var sandbox_app = new sandbox_app_class(sandbox_app_config);
 	var context = sandbox_app;
 	var outputError=(err)=>{//_console.log('TMP',err);
+		//if(err.message || err.code){
+		//	var output = {err_message:err.message || ''};
+		//	if(err.code!=null) output.err_code = err.code;
+		//	//_console.log({err_message:err.message,err_code:err.code});
+		//	_console.log(output);
+		//}
+		_console.log(err.message||'',err.code||'');
 		var lines = (''+err.stack).split('\n');
 		var f=true;
 		for(var i=1;i<lines.length;i++){
 			if(f){
 				var line=lines[i];
-				if(/^\s*at (app|evalmachine|(new Script)|(eval \(eval at <anonymous>))/.test(line)) f=false;
-					_console.log(line);
-				}
+				if(/^\s*at (app|evalmachine|(new Script)|(eval \(eval at <anonymous>))/.test(line)){
+					f=false;
+				}else
+				_console.log(line);
+			}
 		}
 	};
 	my_global.process.on('uncaughtException', (ex) => {
