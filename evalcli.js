@@ -1,13 +1,26 @@
-var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_prompt=(process.stdin.setRawMode)?true:false}={})=>new Promise((resolve,reject)=>{
+const my_global = {};
+if(typeof(global)!='undefined'){
+	for(var k in global){
+		//console.log('link',k);
+		my_global[k]=global[k];
+	}
+}
+var module_exports = async({
+	wrapeval,
+	app=my_global.process.env.PWD+'/app',
+	prompt='>>> ',
+	_console=console,flag_do_prompt=(my_global.process.stdin.setRawMode)?true:false,
+}={})=>new Promise((resolve,reject)=>{
 	var sandbox_app_class = require(app);
 	const readline = require('readline');
-	const wrapeval = require('wrapeval');
+	//const wrapeval = require('wrapeval');
+	if(!wrapeval) wrapeval = require('wrapeval');
 	const sandbox_app_config = {
 		//	breakOnSigint:true,
-		//	timeout:3000,
+		//	timeout:3000,//TODO
 		//	filename:'app',
 		wrapeval,
-		reload:(module_name)=>{ //to reload the $app
+		reload:(module_name)=>{//to reload the $app
 			var cache = require.cache;
 			if(module_name){
 				delete cache[require.resolve(module_name)];
@@ -22,6 +35,8 @@ var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_p
 				return rt;
 			}
 		},
+		//env:()=>my_global.process.env,
+		my_global,//expost the $app
 	};
 	var sandbox_app = new sandbox_app_class(sandbox_app_config);
 	var context = sandbox_app;
@@ -36,15 +51,22 @@ var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_p
 				}
 		}
 	};
-	process.on('uncaughtException', (ex) => _console.log('Uncaught',ex));
-	const argv2o=a=>(a||process.argv||[]).reduce((r,e)=>((m=e.match(/^(\/|--?)([\w-]*)=?"?(.*)"?$/))&&(r[m[2]]=m[3]),r),{});
+	my_global.process.on('uncaughtException', (ex) => {
+		_console.log('Uncaught',ex);
+		if(sandbox_app.handleUncaughtException){
+			sandbox_app.handleUncaughtException(ex);
+		}else{
+			my_global.process.exit(ex.code || -1);
+		}
+	});
+	const argv2o=a=>(a||my_global.process.argv||[]).reduce((r,e)=>((m=e.match(/^(\/|--?)([\w-]*)=?"?(.*)"?$/))&&(r[m[2]]=m[3]),r),{});
 	var argo = argv2o();
 	var ls=[];//lines buffer
 	var err_stack;
-	//var flag_do_prompt=(process.stdin.setRawMode)?true:false; // tag interative mode
+	//var flag_do_prompt=(my_global.process.stdin.setRawMode)?true:false; // tag interative mode
 
 	var {Writable} = require('stream');
-	var output = flag_do_prompt ?  process.stdout : new Writable();
+	var output = flag_do_prompt ?  my_global.process.stdout : new Writable();
 	var lastScriptResult;
 	var fTryExit=false;
 
@@ -52,11 +74,11 @@ var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_p
 			.on('SIGINT',()=>{
 				if(flag_do_prompt){
 					if(fTryExit){
-						process.exit();
+						my_global.process.exit();
 					}else{
 						fTryExit=true;
 						ls=[];
-						r.clearLine(process.out,0);
+						r.clearLine(my_global.process.out,0);
 						_console.log('(To exit, press ^C again or type .exit)')
 						r.prompt();
 					}
@@ -68,7 +90,7 @@ var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_p
 					if(lastScriptResult) _console.log(lastScriptResult);
 				}
 				resolve(lastScriptResult);
-				process.exit(x||0);
+				my_global.process.exit(x||0);
 			})
 			.on("line",async(l)=>{
 				if(fTryExit) fTryExit=false;
@@ -111,11 +133,11 @@ var module_exports = async({app='./app',prompt='>>> ',_console=console,flag_do_p
 					}
 				}
 				outputError(err);
-				if(!flag_do_prompt) process.exit(); 
+				if(!flag_do_prompt) my_global.process.exit(); 
 			}
 			ls=[];//quick clear
 			//return lastScriptResult;//no use
-		},readline.createInterface({input:process.stdin, output })
+		},readline.createInterface({input:my_global.process.stdin, output })
 	);
 });
 
