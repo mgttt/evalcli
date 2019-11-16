@@ -1,1 +1,1 @@
-require('../evalcli')({app:'./test/app'});
+require('../evalcli')({app:'./test/app',wrapeval:require('../../wrapeval')});
