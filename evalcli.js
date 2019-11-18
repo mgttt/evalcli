@@ -22,13 +22,17 @@ var module_exports = async({
 				return require(module_name);
 			}else{
 				delete cache[require.resolve(app)];
-				sandbox_app_class = require(app);
-				sandbox_app = new sandbox_app_class(sandbox_app_config);
-				context = sandbox_app;
-				//var rt = { context,config:sandbox_app_config};
-				var rt = { context };
-				if (sandbox_app!=context) rt.app=sandbox_app;
-				return rt;
+				try{
+					sandbox_app_class = require(app);
+					sandbox_app = new sandbox_app_class(sandbox_app_config);
+					context = sandbox_app;
+					//var rt = { context,config:sandbox_app_config};
+					var rt = { context };
+					if (sandbox_app!=context) rt.app=sandbox_app;
+					return rt;
+				}catch(ex){
+					console.log(ex);
+				}
 			}
 		},
 		//env:()=>my_global.process.env,
