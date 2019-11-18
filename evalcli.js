@@ -1,10 +1,5 @@
-const my_global = {};
-if(typeof(global)!='undefined'){
-	for(var k in global){
-		//console.log('link',k);
-		my_global[k]=global[k];
-	}
-}
+const my_global = {};//don't directly assign global to it coz wrapeval will cleanup global
+if(typeof(global)!='undefined'){ for(var k in global){ my_global[k]=global[k]; } }//quick clone
 var module_exports = async({
 	wrapeval,
 	app=my_global.process.env.PWD+'/app',
@@ -30,7 +25,8 @@ var module_exports = async({
 				sandbox_app_class = require(app);
 				sandbox_app = new sandbox_app_class(sandbox_app_config);
 				context = sandbox_app;
-				var rt = { context,config:sandbox_app_config};
+				//var rt = { context,config:sandbox_app_config};
+				var rt = { context };
 				if (sandbox_app!=context) rt.app=sandbox_app;
 				return rt;
 			}
