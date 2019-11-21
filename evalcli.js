@@ -8,13 +8,11 @@ var module_exports = async({
 }={})=>new Promise((resolve,reject)=>{
 	var sandbox_app_class = require(app);
 	const readline = require('readline');
-	//const wrapeval = require('wrapeval');
-	if(!wrapeval) wrapeval = require('wrapeval');
 	const sandbox_app_config = {
 		//	breakOnSigint:true,
 		//	timeout:3000,//TODO
 		//	filename:'app',
-		wrapeval,
+		//wrapeval,
 		reload:(module_name)=>{//to reload the $app
 			var cache = require.cache;
 			if(module_name){
@@ -39,6 +37,9 @@ var module_exports = async({
 		my_global,//expost the $app
 	};
 	var sandbox_app = new sandbox_app_class(sandbox_app_config);
+	//const wrapeval = require('wrapeval');
+	if(!wrapeval) wrapeval = require('wrapeval');
+	sandbox_app_config.wrapeval = wrapeval;
 	var context = sandbox_app;
 	var outputError=(err)=>{//_console.log('TMP',err);
 		//if(err.message || err.code){
