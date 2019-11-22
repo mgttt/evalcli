@@ -16,8 +16,11 @@ var module_exports = async({
 		reload:(module_name)=>{//to reload the $app
 			var cache = require.cache;
 			if(module_name){
-				delete cache[require.resolve(module_name)];
-				return require(module_name);
+				if(delete cache[require.resolve(module_name)]){
+					require(module_name);
+					return true;
+				}
+				return false;
 			}else{
 				delete cache[require.resolve(app)];
 				try{
@@ -89,7 +92,7 @@ var module_exports = async({
 						fTryExit=true;
 						ls=[];
 						r.clearLine(my_global.process.out,0);
-						_console.log('(To exit, press ^C again or type .exit)')
+						_console.log('(To exit, press ^C again)')
 						r.prompt();
 					}
 				}
