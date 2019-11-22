@@ -1,6 +1,6 @@
 {
   "name": "evalcli",
-  "version": "0.0.10",
+  "version": "0.1.0",
   "description": "cli based on wrapeval",
   "main": "evalcli.js",
   "scripts": {
@@ -9,6 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "wrapeval": "^0.3.5"
+    "wrapeval": "^0.3.6"
   }
 }

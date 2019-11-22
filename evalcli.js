@@ -1,6 +1,7 @@
 const my_global = {};//don't directly assign global to it coz wrapeval will cleanup global
 if(typeof(global)!='undefined'){ for(var k in global){ my_global[k]=global[k]; } }//quick clone
 var module_exports = async({
+	protection,
 	wrapeval,
 	app=my_global.process.env.PWD+'/app',
 	prompt='>>> ',
@@ -119,7 +120,7 @@ var module_exports = async({
 			ls.push(l);
 			try{
 				var codes = ls.join('\n');
-				var thisScriptResult = wrapeval(codes,context);
+				var thisScriptResult = wrapeval(codes,context,protection);
 				if(flag_do_prompt){
 					if(typeof(thisScriptResult)=='function' && /;;\s*$/.test(codes)){
 						thisScriptResult=await thisScriptResult();
