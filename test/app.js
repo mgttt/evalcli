@@ -6,5 +6,6 @@ module.exports = function(sandbox_config){
 		reload:()=>sandbox_config.reload(),
 		//setInterval:sandbox_config.my_global.setInterval,
 		setTimeout:sandbox_config.my_global.setTimeout,
+		//real_global:()=>require('rawglobal'),
 	}
 }

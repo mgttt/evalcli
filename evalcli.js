@@ -1,5 +1,4 @@
-const my_global = {};//don't directly assign global to it coz wrapeval will cleanup global
-if(typeof(global)!='undefined'){ for(var k in global){ my_global[k]=global[k]; } }//quick clone
+const my_global = require('rawglobal');
 var module_exports = async({
 	protection,
 	wrapeval,
