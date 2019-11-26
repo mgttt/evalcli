@@ -10,5 +10,17 @@ module.exports = function(sandbox_config){
 		//real_global:()=>require('rawglobal'),
 		web:p4web({cookie_pack:'test'}).web1_p,
 		p4web,
+		exec:(command,options,callback)=>{
+			var rst=exec(command||'', options||{}, (error, stdout, stderr) => {
+				if (callback){
+					callback(error,stdout,stderr);
+				}else{
+					if (error) { console.error(`exec error: ${error}`); return; }
+					if (stdout) console.log(`stdout: ${stdout}`);
+					if (stderr) console.error(`stderr: ${stderr}`);
+				}
+			});
+		},
+		global:()=>rawglobal,
 	}
 }
