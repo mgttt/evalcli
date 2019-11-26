@@ -1,3 +1,4 @@
+var p4web = require('../../p4web');
 module.exports = function(sandbox_config){
 	return {
 		help:()=>`find ur way out~`,
@@ -7,5 +8,7 @@ module.exports = function(sandbox_config){
 		//setInterval:sandbox_config.my_global.setInterval,
 		setTimeout:sandbox_config.my_global.setTimeout,
 		//real_global:()=>require('rawglobal'),
+		web:p4web({cookie_pack:'test'}).web1_p,
+		p4web,
 	}
 }
