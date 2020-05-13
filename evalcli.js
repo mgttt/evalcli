@@ -1,10 +1,11 @@
+const theProcess = process;
 const my_global = require('rawglobal');
 var module_exports = async({
 	protection,
 	wrapeval,
-	app=my_global.process.env.PWD+'/app',
+	app=theProcess.env.PWD+'/app',
 	prompt='>>> ',
-	_console=console,flag_do_prompt=(my_global.process.stdin.setRawMode)?true:false,
+	_console=console,flag_do_prompt=(theProcess.stdin.setRawMode)?true:false,
 }={})=>new Promise((resolve,reject)=>{
 	var sandbox_app_class = require(app);
 	const readline = require('readline');
@@ -36,8 +37,8 @@ var module_exports = async({
 				}
 			}
 		},
-		//env:()=>my_global.process.env,
-		my_global,//expost the $app
+		//env:()=>theProcess.env,
+		my_global,//expose to $app
 	};
 	var sandbox_app = new sandbox_app_class(sandbox_app_config);
 	//const wrapeval = require('wrapeval');
@@ -64,22 +65,22 @@ var module_exports = async({
 			}
 		}
 	};
-	my_global.process.on('uncaughtException', (ex) => {
+	theProcess.on('uncaughtException', (ex) => {
 		_console.log('Uncaught',ex);
 		if(sandbox_app.handleUncaughtException){
 			sandbox_app.handleUncaughtException(ex);
 		}else{
-			my_global.process.exit(ex.code || -1);
+			theProcess.exit(ex.code || -1);
 		}
 	});
-	const argv2o=a=>(a||my_global.process.argv||[]).reduce((r,e)=>((m=e.match(/^(\/|--?)([\w-]*)=?"?(.*)"?$/))&&(r[m[2]]=m[3]),r),{});
+	const argv2o=a=>(a||theProcess.argv||[]).reduce((r,e)=>((m=e.match(/^(\/|--?)([\w-]*)=?"?(.*)"?$/))&&(r[m[2]]=m[3]),r),{});
 	var argo = argv2o();
 	var ls=[];//lines buffer
 	var err_stack;
-	//var flag_do_prompt=(my_global.process.stdin.setRawMode)?true:false; // tag interative mode
+	//var flag_do_prompt=(theProcess.stdin.setRawMode)?true:false; // tag interative mode
 
 	var {Writable} = require('stream');
-	var output = flag_do_prompt ?  my_global.process.stdout : new Writable();
+	var output = flag_do_prompt ?  theProcess.stdout : new Writable();
 	var lastScriptResult;
 	var fTryExit=false;
 
@@ -87,11 +88,11 @@ var module_exports = async({
 			.on('SIGINT',()=>{
 				if(flag_do_prompt){
 					if(fTryExit){
-						my_global.process.exit();
+						theProcess.exit();
 					}else{
 						fTryExit=true;
 						ls=[];
-						r.clearLine(my_global.process.out,0);
+						r.clearLine(theProcess.out,0);
 						_console.log('(To exit, press ^C again)')
 						r.prompt();
 					}
@@ -103,7 +104,7 @@ var module_exports = async({
 					if(lastScriptResult) _console.log(lastScriptResult);
 				}
 				resolve(lastScriptResult);
-				my_global.process.exit(x||0);
+				theProcess.exit(x||0);
 			})
 			.on("line",async(l)=>{
 				if(fTryExit) fTryExit=false;
@@ -146,11 +147,11 @@ var module_exports = async({
 					}
 				}
 				outputError(err);
-				if(!flag_do_prompt) my_global.process.exit(); 
+				if(!flag_do_prompt) theProcess.exit(); 
 			}
 			ls=[];//quick clear
 			//return lastScriptResult;//no use
-		},readline.createInterface({input:my_global.process.stdin, output })
+		},readline.createInterface({input:theProcess.stdin, output })
 	);
 });
 
